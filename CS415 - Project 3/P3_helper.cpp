@@ -64,9 +64,56 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t) {
 
 
 
+int h(pixel u, pixel t) {
+	return abs(u.row - t.row) + abs(u.col - t.col);
+}
+
 BMP BestFirstSearch(BMP I, pixel s, pixel t) {
 
-	return I;
+	assert(!isObstacle(s, I));
+
+	BMP result = I;
+
+	priority_queue<pixelPriority> Q;
+
+	vector<vector<bool>> visited(I.TellHeight(), vector<bool>(I.TellWidth(), false));
+	vector<vector<int>> distance(I.TellHeight(), vector<int>(I.TellWidth(), numeric_limits<int>::max()));
+	vector<vector<pixel>> previous(I.TellHeight(), vector<pixel>(I.TellWidth()));
+
+	visit(s, visited);
+	setDist(s, h(s, t), distance);
+
+	Q.push({ s, h(s, t) });
+
+	while (!Q.empty() && !(isVisited(t, visited))) {
+		pixel u = Q.top().location;
+		Q.pop();
+
+		if (u != s) makeGreen(u, result);
+
+		vector<pixel> neighbors = getNeighbors(u, I);
+		for (int i = 0; i < neighbors.size(); ++i) {
+			if (!isVisited(neighbors[i], visited)) {
+				visit(neighbors[i], visited);
+				int newDist = getDist(u, distance) + 1;
+				setDist(neighbors[i], newDist, distance);
+				setPrev(neighbors[i], u, previous);
+				Q.push({ neighbors[i], newDist + h(neighbors[i], t) });
+			}
+		}
+	}
+
+	pixel v = t;
+	while (v != s) {
+		makeRed(v, result);
+		v = getPrev(v, previous);
+	}
+
+	// display starter and target pixels as blue
+	makeBlue(s, result);
+	makeBlue(t, result);
+
+	return result;
 }
 
 bool isObstacle(pixel p, BMP image) {

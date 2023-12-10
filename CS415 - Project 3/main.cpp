@@ -22,7 +22,8 @@ int main() {
 	cout << "Height is " << image.TellHeight() << " Width is " << image.TellWidth() << endl;
 	cout << "Pixel 0,0 has Red: " << (int) temp.Red << " Greem:" << (int) temp.Green << " Blue: " << (int) temp.Blue << endl;
 
-	BreadthFirstSearch(image, s, t).WriteToFile("test_result.bmp");
+	//BreadthFirstSearch(image, s, t).WriteToFile("test_result.bmp");
+	BestFirstSearch(image, s, t).WriteToFile("test_result.bmp");
 
 
 	return 0;

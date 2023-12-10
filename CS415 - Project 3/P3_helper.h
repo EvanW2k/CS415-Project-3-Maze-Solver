@@ -45,6 +45,7 @@ struct pixelPriority {
 	}
 };
 
+
 BMP BreadthFirstSearch(BMP I, pixel s, pixel t);
 BMP BestFirstSearch(BMP I, pixel s, pixel t);
 
@@ -64,6 +65,7 @@ vector<pixel> getNeighbors(pixel p, BMP image);
 bool makeGreen(pixel p, BMP& image);
 bool makeRed(pixel p, BMP& image);
 bool makeBlue(pixel p, BMP& image);
+
 
 
 #endif

@@ -12,7 +12,7 @@ using namespace std;
 int main() {
 
 	pixel s = { 0, 0 };
-	pixel t = { 863, 1535 };
+	pixel t = { 99, 99 };
 
 	BMP image;
 	image.ReadFromFile("test.bmp");
@@ -20,7 +20,7 @@ int main() {
 
 	RGBApixel temp = image.GetPixel(0, 0);
 	cout << "Height is " << image.TellHeight() << " Width is " << image.TellWidth() << endl;
-	cout << "Pixel 0,0 has Red: " << (int) temp.Red << " Greem:" << (int) temp.Green << " Blue: " << (int) temp.Blue << endl;
+	cout << "Pixel 0,0 has Red: " << (int) temp.Red << " Green:" << (int) temp.Green << " Blue: " << (int) temp.Blue << endl;
 
 	//BreadthFirstSearch(image, s, t).WriteToFile("test_result.bmp");
 	BestFirstSearch(image, s, t).WriteToFile("test_result.bmp");

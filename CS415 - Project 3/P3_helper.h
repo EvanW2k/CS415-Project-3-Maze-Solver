@@ -36,6 +36,15 @@ struct pixel {
 	}
 };
 
+struct pixelPriority {
+	pixel location;
+	int priority;
+
+	bool operator<(const pixelPriority& p) const {
+		return priority > p.priority; 
+	}
+};
+
 BMP BreadthFirstSearch(BMP I, pixel s, pixel t);
 BMP BestFirstSearch(BMP I, pixel s, pixel t);
 

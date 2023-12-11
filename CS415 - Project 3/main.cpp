@@ -11,6 +11,7 @@
 //************************************************************************
 
 #include <iostream>
+#include <thread>	// to exec breadthFS and bestFS at same time
 #include "P3_helper.h"
 using namespace std;
 
@@ -18,52 +19,74 @@ int main() {
 
 	pixel s, t;
 
-	cout << "Enter the row number of the starting pixel (s): ";
-	cin >> s.row;
-	cout << "Enter the column number of the starting pixel (s): ";
-	cin >> s.col;
-	cout << "Enter the row number of the goal pixel (t): ";
-	cin >> t.row;
-	cout << "Enter the column number of the goal pixel (t): ";
-	cin >> t.col;
-
 	BMP image;
+
 	string inputFileName;
 	string breadthFSOutputFileName;
 	string bestFSOutputFileName;
 
 	int breadthDist, bestDist;
 
-	std::cout << "Please enter the name of the BMP file to read including .bmp: ";
-	std::cin >> inputFileName;
 
+	// get coordinate inputs
+	cout << "Enter the column number of the starting pixel (s): ";
+	cin >> s.col;
+	cout << "Enter the row number of the starting pixel (s): ";
+	cin >> s.row;
+
+	cout << "Enter the column number of the goal pixel (t): ";
+	cin >> t.col;
+	cout << "Enter the row number of the goal pixel (t): ";
+	cin >> t.row;
+
+	// input image file
+	cout << "Please enter the name of the BMP file to read including .bmp: ";
+	cin >> inputFileName;
+
+	// copy file to BMP object
 	if (!image.ReadFromFile(inputFileName.c_str())) {
-		std::cerr << "Error reading file " << inputFileName << std::endl;
+		cerr << "Error reading file " << inputFileName << endl;
 		return 1;
 	}
 
-	std::cout << "Enter the name of the breadth first search output BMP file including .bmp: ";
-	std::cin >> breadthFSOutputFileName;
-	std::cout << "Enter the name of the best first search output BMP file including .bmp: ";
-	std::cin >> bestFSOutputFileName;
+	// cout << "Height: " << image.TellHeight() << " Width: " << image.TellWidth() << endl;
+	// cout << "t color: " << (int) image(t.col, t.row)->Red << " " << (int) image(t.col, t.row)->Blue << " " << (int) image(t.col, t.row)->Green << endl;
 
-	//BreadthFirstSearch(image, s, t, breadthDist);
-	if (!BreadthFirstSearch(image, s, t, breadthDist).WriteToFile(breadthFSOutputFileName.c_str())) {
-		std::cerr << "Error writing to file " << breadthFSOutputFileName << std::endl;
-		return 1;
-	}
+	// output file names
+	cout << "Enter the name of the breadth FS output file including .bmp: ";
+	cin >> breadthFSOutputFileName;
+	cout << "Enter the name of the best FS output file including .bmp: ";
+	cin >> bestFSOutputFileName;
 
-	//BestFirstSearch(image, s, t, bestDist);
-	if (!BestFirstSearch(image, s, t, bestDist).WriteToFile(bestFSOutputFileName.c_str())) {
-		std::cerr << "Error writing to file " << bestFSOutputFileName << std::endl;
-		return 1;
-	}
 
-	std::cout << "Breadth-First Search output saved to " << breadthFSOutputFileName << std::endl;
-	std::cout << "Best-First Search output saved to " << bestFSOutputFileName << std::endl;
 
-	std::cout << "Breadth-First Search distance: " << breadthDist << std::endl;
-	std::cout << "Best-First Search distance " << bestDist << std::endl;
 
+	cout << "Creating Output Images (this may take a minute)...\n";
+
+	// threaded calls to breadthFS and bestFS function calls
+
+	thread breadth_Thread{ [=, &breadthDist, &image]() {
+		if (!BreadthFirstSearch(image, s, t, breadthDist).WriteToFile(breadthFSOutputFileName.c_str())) {
+			cerr << "Error writing to file " << breadthFSOutputFileName << endl;
+			return 1;
+		}
+		cout << "Breadth-First Search output saved to " << breadthFSOutputFileName << endl;
+
+	} };
+
+
+	thread best_Thread{ [=, &bestDist, &image]() {
+		if (!BestFirstSearch(image, s, t, bestDist).WriteToFile(bestFSOutputFileName.c_str())) {
+			cerr << "Error writing to file " << bestFSOutputFileName << endl;
+			return 1;
+		}
+		cout << "Best-First Search output saved to " << bestFSOutputFileName << endl;
+
+	} };
+	breadth_Thread.join();
+	best_Thread.join();
+
+	cout << "Breadth-First distance: " << breadthDist << endl;
+	cout << "Best-First distance: " << bestDist << endl;
 	return 0;
 }

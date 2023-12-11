@@ -29,19 +29,18 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 	queue<pixel> Q;
 
 	// 2d visited bool vector initalized to image size with values = false
-	vector<vector<bool>> visited (I.TellHeight(), vector<bool>(I.TellWidth(), false));
-	// 2d distance vector, initalized to image size with values = integer max
-	vector<vector<int>> distance(I.TellHeight(), vector<int>(I.TellWidth(), numeric_limits<int>::max()));
+	vector<vector<bool>> visited (I.TellWidth(), vector<bool>(I.TellHeight(), false));
 	// 2d previous vector of pixels, initalized to image size
-	vector<vector<pixel>> previous(I.TellHeight(), vector<pixel>(I.TellWidth(), {-1, -1}));
+	vector<vector<pixel>> previous(I.TellWidth(), vector<pixel>(I.TellHeight(), {-1, -1}));
 
 	Q.push(s);
 	visit(s, visited);
-	setDist(s, 0, distance);
 
 	while (!Q.empty() && !(isVisited(t, visited))) {
 		pixel u = Q.front();
 		Q.pop();
+
+		// cout << "Looking at pixel: " << u.col << ", " << u.row << endl;
 
 		vector<pixel> neighbors = getNeighbors(u, t, I);
 		for (int i = 0; i < neighbors.size(); ++i) {
@@ -49,7 +48,6 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 				// visit, update dist, and color
 				visit(neighbors[i], visited);
 				makeGreen(neighbors[i], result);
-				setDist(neighbors[i], getDist(u, distance) + 1, distance);
 
 				// set prev and push
 				setPrev(neighbors[i], u, previous);
@@ -58,8 +56,10 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 		}
 	}
 
+	dist = 1;
 	pixel v = t;
 	while (v != s) {
+		dist++;
 		makeRed(v, result);
 		v = getPrev(v, previous);
 	}
@@ -68,8 +68,6 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 	makeBlue(s, result);
 	makeBlue(t, result);
 
-	// edit distance which is passed by reference
-	dist = getDist(t, distance);
 	return result;
 }
 
@@ -90,9 +88,12 @@ BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 
     priority_queue<pixelPriority> Q;
 
-    vector<vector<bool>> visited (I.TellHeight(), vector<bool>(I.TellWidth(), false));
-    vector<vector<int>> distance(I.TellHeight(), vector<int>(I.TellWidth(), numeric_limits<int>::max()));
-    vector<vector<pixel>> previous(I.TellHeight(), vector<pixel>(I.TellWidth(), { -1, -1 }));
+	// 2d visited bool vector initalized to image size with values = false
+	vector<vector<bool>> visited(I.TellWidth(), vector<bool>(I.TellHeight(), false));
+	// 2d distance vector, initalized to image size with values = integer max
+	vector<vector<int>> distance(I.TellWidth(), vector<int>(I.TellHeight(), numeric_limits<int>::max()));
+	// 2d previous vector of pixels, initalized to image size
+	vector<vector<pixel>> previous(I.TellWidth(), vector<pixel>(I.TellHeight(), { -1, -1 }));
 
     visit(s, visited);
     setDist(s, h(s, t), distance);
@@ -103,6 +104,7 @@ BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
         pixel u = Q.top().location;
         Q.pop();
 
+		// cout << "Looking at pixel: " << u.col << ", " << u.row << endl;
 
         vector<pixel> neighbors = getNeighbors(u, t, I);
         for (int i = 0; i < neighbors.size(); ++i) {
@@ -118,9 +120,10 @@ BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
             }
         }
     }
-
+	dist = 1;
     pixel v = t;
     while (v != s) {
+		dist++;
         makeRed(v, result);
         v = getPrev(v, previous);
     }
@@ -129,8 +132,6 @@ BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
     makeBlue(s, result);
     makeBlue(t, result);
 
-	// edit distance which is passed by reference
-	dist = getDist(t, distance) / 2; // divide by 2 to make up for change 'h' function did
 	return result;
 }
 
@@ -143,7 +144,7 @@ BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 // are any pixel with all RGB values below 100.
 //**********************************************************************
 bool isObstacle(pixel p, BMP image) {
-	if (image(p.row, p.col)->Red > 100 || image(p.row, p.col)->Green > 100 || image(p.row, p.col)->Blue > 100) {
+	if (image(p.col, p.row)->Red > 100 || image(p.col, p.row)->Green > 100 || image(p.col, p.row)->Blue > 100) {
 		return false;
 	}
 	return true;
@@ -157,7 +158,7 @@ bool isObstacle(pixel p, BMP image) {
 // DESC: switched the pixel to visited
 //**********************************************************************
 bool visit(pixel p, vector<vector<bool>>& visited) {
-	visited[p.row][p.col] = true;
+	visited[p.col][p.row] = true;
 	return true;
 }
 
@@ -168,8 +169,8 @@ bool visit(pixel p, vector<vector<bool>>& visited) {
 // Return: visit status of pixel in terms of a bool
 // DESC: Returns the visted value for the particular pixel.
 //**********************************************************************
-bool isVisited(pixel p, vector<vector<bool>>& visited) {
-	return visited[p.row][p.col];
+bool isVisited(pixel p, vector<vector<bool>> visited) {
+	return visited[p.col][p.row];
 }
 
 
@@ -180,7 +181,7 @@ bool isVisited(pixel p, vector<vector<bool>>& visited) {
 // DESC: sets the distance value for the pixel.
 //**********************************************************************
 bool setDist(pixel p, int dist, vector<vector<int>>& distance) {
-	distance[p.row][p.col] = dist;
+	distance[p.col][p.row] = dist;
 	return true;
 }
 
@@ -191,7 +192,7 @@ bool setDist(pixel p, int dist, vector<vector<int>>& distance) {
 // DESC: return dist value for pixel
 //**********************************************************************
 int getDist(pixel p, vector<vector<int>> distance) {
-	return distance[p.row][p.col];
+	return distance[p.col][p.row];
 }
 
 //**********************************************************************
@@ -201,7 +202,7 @@ int getDist(pixel p, vector<vector<int>> distance) {
 // DESC: sets the pixel's previous pixel.
 //**********************************************************************
 bool setPrev(pixel p, pixel prev_p, vector<vector<pixel>>& previous) {
-	previous[p.row][p.col] = prev_p;
+	previous[p.col][p.row] = prev_p;
 	return true;
 }
 
@@ -212,8 +213,8 @@ bool setPrev(pixel p, pixel prev_p, vector<vector<pixel>>& previous) {
 // DESC: returns the pixel that is the current pixels previous
 //**********************************************************************
 pixel getPrev(pixel p, vector<vector<pixel>> previous) {
-	assert(previous[p.row][p.col].row != -1);	// make sure there is a previous
-	return previous[p.row][p.col];
+	assert(previous[p.col][p.row].col != -1);	// make sure there is a previous
+	return previous[p.col][p.row];
 }
 
 
@@ -230,47 +231,47 @@ vector<pixel> getNeighbors(pixel p, pixel t, BMP image) {
 
 	// optimal neighbor order for t being down and right
 	if (p.col <= t.col && p.row <= t.row) {
-		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.row, p.col + 1 }, image))
-			neighbors.push_back({ p.row, p.col + 1 });		// east neighbor
-		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.row + 1, p.col }, image))
-			neighbors.push_back({ p.row + 1, p.col });		// south neighbor
-		if (p.col - 1 >= 0 && !isObstacle({ p.row, p.col - 1 }, image))
-			neighbors.push_back({ p.row, p.col - 1 });		// west neighbor
-		if (p.row - 1 >= 0 && !isObstacle({ p.row - 1, p.col }, image))
-			neighbors.push_back({ p.row - 1, p.col });		// north neighbor
+		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.col, p.row + 1 }, image))
+			neighbors.push_back({ p.col, p.row + 1 });		// south neighbor
+		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.col + 1, p.row }, image))
+			neighbors.push_back({ p.col + 1, p.row });		// east neighbor
+		if (p.row - 1 >= 0 && !isObstacle({ p.col, p.row - 1 }, image))
+			neighbors.push_back({ p.col, p.row - 1 });		// north neighbor
+		if (p.col - 1 >= 0 && !isObstacle({ p.col - 1, p.row }, image))
+			neighbors.push_back({ p.col - 1, p.row });		// west neighbor
 	}
 	// optimal neighbor order for t being up and right
 	else if (p.col < t.col && p.row > t.row) {
-		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.row, p.col + 1 }, image))
-			neighbors.push_back({ p.row, p.col + 1 });		// east neighbor
-		if (p.row - 1 >= 0 && !isObstacle({ p.row - 1, p.col }, image))
-			neighbors.push_back({ p.row - 1, p.col });		// north neighbor
-		if (p.col - 1 >= 0 && !isObstacle({ p.row, p.col - 1 }, image))
-			neighbors.push_back({ p.row, p.col - 1 });		// west neighbor
-		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.row + 1, p.col }, image))
-			neighbors.push_back({ p.row + 1, p.col });		// south neighbor
+		if (p.row - 1 >= 0 && !isObstacle({ p.col, p.row - 1 }, image))
+			neighbors.push_back({ p.col, p.row - 1 });		// north neighbor
+		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.col + 1, p.row }, image))
+			neighbors.push_back({ p.col + 1, p.row });		// east neighbor
+		if (p.col - 1 >= 0 && !isObstacle({ p.col - 1, p.row }, image))
+			neighbors.push_back({ p.col - 1, p.row });		// west neighbor
+		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.col, p.row + 1 }, image))
+			neighbors.push_back({ p.col, p.row + 1 });		// south neighbor
 	}
 	// optimal neighbor order for t being up and left
 	else if (p.col > t.col && p.row > t.row) {
-		if (p.col - 1 >= 0 && !isObstacle({ p.row, p.col - 1 }, image))
-			neighbors.push_back({ p.row, p.col - 1 });		// west neighbor
-		if (p.row - 1 >= 0 && !isObstacle({ p.row - 1, p.col }, image))
-			neighbors.push_back({ p.row - 1, p.col });		// north neighbor
-		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.row, p.col + 1 }, image))
-			neighbors.push_back({ p.row, p.col + 1 });		// east neighbor
-		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.row + 1, p.col }, image))
-			neighbors.push_back({ p.row + 1, p.col });		// south neighbor
+		if (p.row - 1 >= 0 && !isObstacle({ p.col, p.row - 1 }, image))
+			neighbors.push_back({ p.col, p.row - 1 });		// north neighbor
+		if (p.col - 1 >= 0 && !isObstacle({ p.col - 1, p.row }, image))
+			neighbors.push_back({ p.col - 1, p.row });		// west neighbor
+		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.col + 1, p.row }, image))
+			neighbors.push_back({ p.col + 1, p.row });		// east neighbor
+		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.col, p.row + 1 }, image))
+			neighbors.push_back({ p.col, p.row + 1 });		// south neighbor
 	}
 	// optimal neighbor order for t being down and left
 	else {
-		if (p.col - 1 >= 0 && !isObstacle({ p.row, p.col - 1 }, image))
-			neighbors.push_back({ p.row, p.col - 1 });		// west neighbor
-		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.row + 1, p.col }, image))
-			neighbors.push_back({ p.row + 1, p.col });		// south neighbor
-		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.row, p.col + 1 }, image))
-			neighbors.push_back({ p.row, p.col + 1 });		// east neighbor
-		if (p.row - 1 >= 0 && !isObstacle({ p.row - 1, p.col }, image))
-			neighbors.push_back({ p.row - 1, p.col });		// north neighbor
+		if (p.row + 1 < image.TellHeight() && !isObstacle({ p.col, p.row + 1 }, image))
+			neighbors.push_back({ p.col, p.row + 1 });		// south neighbor
+		if (p.col - 1 >= 0 && !isObstacle({ p.col - 1, p.row }, image))
+			neighbors.push_back({ p.col - 1, p.row });		// west neighbor
+		if (p.col + 1 < image.TellWidth() && !isObstacle({ p.col + 1, p.row }, image))
+			neighbors.push_back({ p.col + 1, p.row });		// east neighbor
+		if (p.row - 1 >= 0 && !isObstacle({ p.col, p.row - 1 }, image))
+			neighbors.push_back({ p.col, p.row - 1 });		// north neighbor
 	}
 
 
@@ -285,10 +286,10 @@ vector<pixel> getNeighbors(pixel p, pixel t, BMP image) {
 // DESC: colors the pixel in the image green
 //**********************************************************************
 bool makeGreen(pixel p, BMP& image) {
-	image(p.row, p.col)->Red = 0;
-	image(p.row, p.col)->Green = 255;
-	image(p.row, p.col)->Blue = 0;
-	image(p.row, p.col)->Alpha = 0;
+	image(p.col, p.row)->Red = 0;
+	image(p.col, p.row)->Green = 255;
+	image(p.col, p.row)->Blue = 0;
+	image(p.col, p.row)->Alpha = 0;
 	return true;
 }
 
@@ -299,10 +300,10 @@ bool makeGreen(pixel p, BMP& image) {
 // DESC: colors the pixel in the image Red
 //**********************************************************************
 bool makeRed(pixel p, BMP& image) {
-	image(p.row, p.col)->Red = 255;
-	image(p.row, p.col)->Green = 0;
-	image(p.row, p.col)->Blue = 0;
-	image(p.row, p.col)->Alpha = 0;
+	image(p.col, p.row)->Red = 255;
+	image(p.col, p.row)->Green = 0;
+	image(p.col, p.row)->Blue = 0;
+	image(p.col, p.row)->Alpha = 0;
 	return true;
 }
 
@@ -314,10 +315,10 @@ bool makeRed(pixel p, BMP& image) {
 // DESC: colors the pixel in the image Blue
 //**********************************************************************
 bool makeBlue(pixel p, BMP& image) {
-	image(p.row, p.col)->Red = 0;
-	image(p.row, p.col)->Green = 0;
-	image(p.row, p.col)->Blue = 255;
-	image(p.row, p.col)->Alpha = 0;
+	image(p.col, p.row)->Red = 0;
+	image(p.col, p.row)->Green = 0;
+	image(p.col, p.row)->Blue = 255;
+	image(p.col, p.row)->Alpha = 0;
 	return true;
 }
 

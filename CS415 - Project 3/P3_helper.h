@@ -5,7 +5,7 @@
 // File: P3_helper.h
 // 
 // Description: Header file for all the function definitions 
-// in P3_helper.cpp.
+// in P3_helper.cpp, saving up space in main.cpp
 //************************************************************************
 
 
@@ -46,8 +46,8 @@ struct pixelPriority {
 };
 
 
-BMP BreadthFirstSearch(BMP I, pixel s, pixel t);
-BMP BestFirstSearch(BMP I, pixel s, pixel t);
+BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist);
+BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist);
 
 bool isObstacle(pixel p, BMP image);
 
@@ -60,12 +60,12 @@ int getDist(pixel p, vector<vector<int>> distance);
 bool setPrev(pixel p, pixel prev_p, vector<vector<pixel>>& previous);
 pixel getPrev(pixel p, vector<vector<pixel>> previous);
 
-vector<pixel> getNeighbors(pixel p, BMP image);
+vector<pixel> getNeighbors(pixel p, pixel t, BMP image);
 
 bool makeGreen(pixel p, BMP& image);
 bool makeRed(pixel p, BMP& image);
 bool makeBlue(pixel p, BMP& image);
 
-
+int h(pixel u, pixel t);
 
 #endif

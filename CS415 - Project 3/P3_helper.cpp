@@ -11,7 +11,7 @@
 
 //**********************************************************************
 // Function: BreadthFirstSearch
-// In: BMP image, starting pixel, ending pixel, a distance to return
+// In: BMP image, starting pixel, terminate pixel, a distance to return
 // Return: Distance from s to t, and the result BMP image
 // DESC: From the starting pixel searches all neighbors for pixel t,
 // adding them to a queue, then searching the next pixel in the queue 
@@ -76,12 +76,11 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 
 //**********************************************************************
 // Function: BestFirstSearch
-// In: BMP image, starting pixel, ending pixel, a distance to return
-// Return: Distance from s to t, and the result BMP image
-// DESC: Seeks the shortest path from a start pixel s to a target pixel t in an image. 
-// It employs a heuristic to prioritize nearer pixels to t, using a priority queue 
-// for efficient exploration. Once t is found, the path from s to t is traced back 
-// and marked, and the path length is returned by reference."
+// In: image, start pizel, terminate pixel, reference to int dist
+// Return: BMP image, and dist from of path
+// DESC: Like BReadthFirstSearch but instead uses a priority queue to
+// determine which pixel ot check. The value is based on the distance
+// a pixel is from t.
 //**********************************************************************
 BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 
@@ -131,7 +130,7 @@ BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
     makeBlue(t, result);
 
 	// edit distance which is passed by reference
-	dist = getDist(t, distance); // divide by 2 to make up for change 'h' function did
+	dist = getDist(t, distance) / 2; // divide by 2 to make up for change 'h' function did
 	return result;
 }
 
@@ -324,10 +323,10 @@ bool makeBlue(pixel p, BMP& image) {
 
 
 //**********************************************************************
-// Function: 
-// In: 
-// Return: b
-// DESC: 
+// Function: h
+// In: a pixel, and terminating pixel
+// Return: distance form t
+// DESC: uses pythagrum theorum to get distance from u to t.
 //**********************************************************************
 int h(pixel u, pixel t) {
 	return abs(u.row - t.row) + abs(u.col - t.col);

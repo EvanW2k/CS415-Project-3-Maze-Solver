@@ -75,10 +75,13 @@ BMP BreadthFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 
 
 //**********************************************************************
-// Function: 
-// In: 
-// Return: 
-// DESC: 
+// Function: BestFirstSearch
+// In: BMP image, starting pixel, ending pixel, a distance to return
+// Return: Distance from s to t, and the result BMP image
+// DESC: Seeks the shortest path from a start pixel s to a target pixel t in an image. 
+// It employs a heuristic to prioritize nearer pixels to t, using a priority queue 
+// for efficient exploration. Once t is found, the path from s to t is traced back 
+// and marked, and the path length is returned by reference."
 //**********************************************************************
 BMP BestFirstSearch(BMP I, pixel s, pixel t, int& dist) {
 

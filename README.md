@@ -10,7 +10,7 @@ Date: December 13th, 2023
  
 - There are 2 test cases each with a recommended start ***s***, and goal ***t*** in (col, row) format
     - *maze.bmp*   start pixel: (8, 8)   goal pixel: (202, 190)
-    - *maze2.bmp*  start pixel: (0,0)    goal pixel: (78, 0)
+    - *maze2.bmp*  start pixel: (0, 0)    goal pixel: (78, 0)
 
 <ins>Contributions:</ins>
 

@@ -68,7 +68,7 @@ int main() {
 	thread breadth_Thread{ [=, &breadthDist, &image]() {
 		if (!BreadthFirstSearch(image, s, t, breadthDist).WriteToFile(breadthFSOutputFileName.c_str())) {
 			cerr << "Error writing to file " << breadthFSOutputFileName << endl;
-			return 1;
+			exit (1);
 		}
 		cout << "Breadth-First Search output saved to " << breadthFSOutputFileName << endl;
 
@@ -78,7 +78,7 @@ int main() {
 	thread best_Thread{ [=, &bestDist, &image]() {
 		if (!BestFirstSearch(image, s, t, bestDist).WriteToFile(bestFSOutputFileName.c_str())) {
 			cerr << "Error writing to file " << bestFSOutputFileName << endl;
-			return 1;
+			exit (1);
 		}
 		cout << "Best-First Search output saved to " << bestFSOutputFileName << endl;
 

@@ -11,7 +11,8 @@ The algorithm traverses a BMP image.
 - **Obstacles** are defined as any pixel with all RGB values less than 100.
   - Example: Red has RGB (255, 0, 0) this is not an obstacle as one of the values is > 100.
   - Black has RGB (0, 0, 0) all values are < 100 so it is an obstacle
-  - - Everything appears to work fine, ran it on blue with the makefile.
+- A new image is created showing the path each algorithm used.
+- Everything appears to work fine, ran it on blue with the makefile.
  
 - There are 2 test cases each with a recommended start ***s***, and goal ***t*** in (col, row) format
     - *maze.bmp*   start pixel: (8, 8)   goal pixel: (202, 190)
